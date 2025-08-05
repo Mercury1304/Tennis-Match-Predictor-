@@ -2,7 +2,7 @@
 
 A comprehensive, humanized machine learning application that predicts tennis match outcomes using historical Grand Slam data. Features an intuitive web interface, comprehensive error handling, and detailed statistical analysis.
 
-## Humanized Features
+## Features
 
 ### Enhanced User Experience
 - **Intuitive Interface**: Modern, responsive design with clear visual hierarchy
@@ -359,5 +359,6 @@ The Tennis Match Predictor demonstrates:
 ---
 
 **Experience the future of tennis predictions with our humanized, AI-powered Tennis Match Predictor!**
+
 
 *Get instant predictions, detailed analysis, and beautiful visualizations - all with an intuitive, user-friendly interface designed for tennis enthusiasts and data scientists alike.* 
