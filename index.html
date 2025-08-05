@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tennis Match Predictor - AI-Powered Tennis Predictions</title>
+    <meta name="description" content="Predict tennis match outcomes using machine learning. Get real-time predictions for Grand Slam tournaments with confidence scores and probability analysis.">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            font-size: 1rem;
+            opacity: 0.8;
+            font-style: italic;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card .description {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group .help-text {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 30px;
+            display: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .result-card.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .prediction-result {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .winner {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .confidence {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .confidence-level {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .confidence-high {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .confidence-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .confidence-low {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .match-details {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+
+        .match-details h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .match-details .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .probability-bars {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .probability-bar {
+            flex: 1;
+            text-align: center;
+        }
+
+        .bar {
+            height: 200px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 10px;
+            border: 2px solid #e9ecef;
+        }
+
+        .bar-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: height 1s ease;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .bar-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left-color: #28a745;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left-color: #dc3545;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left-color: #17a2b8;
+        }
+
+        .help-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .help-section h3 {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .help-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .help-section li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .help-section li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-ready {
+            background: #28a745;
+        }
+
+        .status-training {
+            background: #ffc107;
+        }
+
+        .status-error {
+            background: #dc3545;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .probability-bars {
+                flex-direction: column;
+            }
+
+            .container {
+                padding: 10px;
+            }
+        }
+
+        .feature-highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .feature-highlight h3 {
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .feature-highlight p {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-tennis-ball"></i> Tennis Match Predictor</h1>
+            <p>AI-Powered Tennis Match Predictions</p>
+            <p class="subtitle">Predict Grand Slam outcomes using machine learning</p>
+        </div>
+
+        <div class="feature-highlight">
+            <h3><i class="fas fa-star"></i> How It Works</h3>
+            <p>Our AI model analyzes historical Grand Slam data to predict match outcomes based on player rankings, tournament type, and court surface. Get instant predictions with confidence scores!</p>
+        </div>
+
+        <div class="help-section">
+            <h3><i class="fas fa-question-circle"></i> Quick Guide</h3>
+            <ul>
+                <li>First, train the model with historical tennis data</li>
+                <li>Enter player rankings, tournament, and surface</li>
+                <li>Get instant predictions with confidence scores</li>
+                <li>View detailed statistics and insights</li>
+            </ul>
+        </div>
+
+        <div class="alert alert-success" id="successAlert"></div>
+        <div class="alert alert-error" id="errorAlert"></div>
+        <div class="alert alert-info" id="infoAlert"></div>
+
+        <div class="main-content">
+            <div class="card">
+                <h2><i class="fas fa-cogs"></i> Train Model</h2>
+                <p class="description">
+                    Start by training our machine learning model with historical Grand Slam data. 
+                    This process analyzes patterns in player rankings, tournament types, and court surfaces.
+                </p>
+                <div class="form-group">
+                    <label>Model Status: <span class="status-indicator" id="modelStatus"></span><span id="statusText">Not trained</span></label>
+                </div>
+                <button class="btn" onclick="trainModel()" id="trainBtn">
+                    <i class="fas fa-play"></i> Train Model
+                </button>
+                <div class="loading" id="trainLoading">
+                    <div class="spinner"></div>
+                    <p>Training model with historical data...</p>
+                    <p style="font-size: 0.9rem; color: #666;">This may take a few moments</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-chart-line"></i> Match Prediction</h2>
+                <p class="description">
+                    Enter match details to get AI-powered predictions. Our model considers player rankings, 
+                    tournament type, and court surface to predict the winner.
+                </p>
+                <form id="predictionForm">
+                    <div class="form-group">
+                        <label for="player1Ranking">Player 1 ATP Ranking:</label>
+                        <input type="number" id="player1Ranking" min="1" max="1000" value="1" required>
+                        <div class="help-text">Enter the ATP ranking (1-1000) for the first player</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="player2Ranking">Player 2 ATP Ranking:</label>
+                        <input type="number" id="player2Ranking" min="1" max="1000" value="2" required>
+                        <div class="help-text">Enter the ATP ranking (1-1000) for the second player</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="tournament">Tournament:</label>
+                        <select id="tournament" required>
+                            <option value="Australian Open">Australian Open</option>
+                            <option value="French Open">French Open</option>
+                            <option value="Wimbledon">Wimbledon</option>
+                            <option value="U.S. Open">U.S. Open</option>
+                        </select>
+                        <div class="help-text">Select the Grand Slam tournament</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="surface">Surface:</label>
+                        <select id="surface" required>
+                            <option value="Plexicushion Prestige">Plexicushion Prestige</option>
+                            <option value="Clay">Clay</option>
+                            <option value="Grass / Outdoor">Grass / Outdoor</option>
+                            <option value="DecoTurf - outdoors">DecoTurf - outdoors</option>
+                        </select>
+                        <div class="help-text">Select the court surface type</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="year">Year:</label>
+                        <input type="number" id="year" min="2020" max="2030" value="2024" required>
+                        <div class="help-text">Enter the match year (2020-2030)</div>
+                    </div>
+                    <button type="submit" class="btn" id="predictBtn" disabled>
+                        <i class="fas fa-magic"></i> Predict Match
+                    </button>
+                </form>
+                <div class="loading" id="predictLoading">
+                    <div class="spinner"></div>
+                    <p>Analyzing match data...</p>
+                    <p style="font-size: 0.9rem; color: #666;">Processing player rankings and conditions</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-card" id="resultCard">
+            <h2><i class="fas fa-trophy"></i> Prediction Result</h2>
+            <div class="prediction-result">
+                <div class="winner" id="winner"></div>
+                <div class="confidence" id="confidence"></div>
+                <div class="confidence-level" id="confidenceLevel"></div>
+            </div>
+            <div class="match-details" id="matchDetails">
+                <h4><i class="fas fa-info-circle"></i> Match Details</h4>
+                <div id="matchDetailsContent"></div>
+            </div>
+            <div class="probability-bars">
+                <div class="probability-bar">
+                    <div class="bar">
+                        <div class="bar-fill" id="player1Bar"></div>
+                    </div>
+                    <div class="bar-label">Player 1 Win Probability</div>
+                </div>
+                <div class="probability-bar">
+                    <div class="bar">
+                        <div class="bar-fill" id="player2Bar"></div>
+                    </div>
+                    <div class="bar-label">Player 2 Win Probability</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+            <!-- Stats will be loaded here -->
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let modelTrained = false;
+
+        // Show/hide alerts
+        function showAlert(message, type) {
+            const alert = document.getElementById(type === 'success' ? 'successAlert' : 
+                                               type === 'error' ? 'errorAlert' : 'infoAlert');
+            alert.textContent = message;
+            alert.style.display = 'block';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 6000);
+        }
+
+        // Update model status
+        function updateModelStatus(status, text) {
+            const statusIndicator = document.getElementById('modelStatus');
+            const statusText = document.getElementById('statusText');
+            
+            statusIndicator.className = 'status-indicator status-' + status;
+            statusText.textContent = text;
+        }
+
+        // Train model
+        async function trainModel() {
+            const trainBtn = document.getElementById('trainBtn');
+            const trainLoading = document.getElementById('trainLoading');
+            const predictBtn = document.getElementById('predictBtn');
+
+            trainBtn.style.display = 'none';
+            trainLoading.style.display = 'block';
+            updateModelStatus('training', 'Training...');
+
+            try {
+                const response = await fetch('/api/train', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    modelTrained = true;
+                    predictBtn.disabled = false;
+                    updateModelStatus('ready', 'Ready for predictions');
+                    loadStats();
+                    
+                    // Show additional info
+                    if (data.top_features) {
+                        showAlert(`Top features: ${data.top_features.map(f => f.feature).join(', ')}`, 'info');
+                    }
+                } else {
+                    showAlert(`Error: ${data.error}`, 'error');
+                    updateModelStatus('error', 'Training failed');
+                }
+            } catch (error) {
+                showAlert('Error training model. Please check your connection and try again.', 'error');
+                updateModelStatus('error', 'Connection error');
+            } finally {
+                trainBtn.style.display = 'block';
+                trainLoading.style.display = 'none';
+            }
+        }
+
+        // Predict match
+        async function predictMatch(event) {
+            event.preventDefault();
+
+            if (!modelTrained) {
+                showAlert('Please train the model first!', 'error');
+                return;
+            }
+
+            const predictBtn = document.getElementById('predictBtn');
+            const predictLoading = document.getElementById('predictLoading');
+            const resultCard = document.getElementById('resultCard');
+
+            predictBtn.style.display = 'none';
+            predictLoading.style.display = 'block';
+
+            const formData = {
+                player1_ranking: parseInt(document.getElementById('player1Ranking').value),
+                player2_ranking: parseInt(document.getElementById('player2Ranking').value),
+                tournament: document.getElementById('tournament').value,
+                surface: document.getElementById('surface').value,
+                year: parseInt(document.getElementById('year').value)
+            };
+
+            try {
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResult(data);
+                    resultCard.classList.add('show');
+                    showAlert(data.message, 'success');
+                } else {
+                    showAlert(`Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                showAlert('Error making prediction. Please try again.', 'error');
+            } finally {
+                predictBtn.style.display = 'block';
+                predictLoading.style.display = 'none';
+            }
+        }
+
+        // Display prediction result
+        function displayResult(data) {
+            document.getElementById('winner').textContent = data.winner;
+            document.getElementById('confidence').textContent = `Confidence: ${data.confidence}%`;
+            
+            // Set confidence level styling
+            const confidenceLevel = document.getElementById('confidenceLevel');
+            confidenceLevel.textContent = data.confidence_level;
+            confidenceLevel.className = 'confidence-level';
+            
+            if (data.confidence >= 80) {
+                confidenceLevel.classList.add('confidence-high');
+            } else if (data.confidence >= 60) {
+                confidenceLevel.classList.add('confidence-medium');
+            } else {
+                confidenceLevel.classList.add('confidence-low');
+            }
+
+            // Update probability bars
+            const player1Bar = document.getElementById('player1Bar');
+            const player2Bar = document.getElementById('player2Bar');
+
+            player1Bar.style.height = `${data.player1_win_probability}%`;
+            player2Bar.style.height = `${data.player2_win_probability}%`;
+
+            // Add percentage labels
+            player1Bar.innerHTML = `<div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); color: white; font-weight: bold;">${data.player1_win_probability}%</div>`;
+            player2Bar.innerHTML = `<div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); color: white; font-weight: bold;">${data.player2_win_probability}%</div>`;
+
+            // Display match details
+            if (data.match_details) {
+                const detailsContent = document.getElementById('matchDetailsContent');
+                detailsContent.innerHTML = `
+                    <div class="detail-row">
+                        <span>Player 1 Ranking:</span>
+                        <span>#${data.match_details.player1_ranking}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>Player 2 Ranking:</span>
+                        <span>#${data.match_details.player2_ranking}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>Tournament:</span>
+                        <span>${data.match_details.tournament}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>Surface:</span>
+                        <span>${data.match_details.surface}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>Year:</span>
+                        <span>${data.match_details.year}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>Ranking Difference:</span>
+                        <span>${data.match_details.ranking_difference} positions</span>
+                    </div>
+                `;
+            }
+        }
+
+        // Load statistics
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+
+                if (data.success) {
+                    const stats = data.stats;
+                    const statsGrid = document.getElementById('statsGrid');
+
+                    statsGrid.innerHTML = `
+                        <div class="stat-card">
+                            <div class="stat-number">${stats.total_matches}</div>
+                            <div class="stat-label">Total Matches</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${stats.tournaments.length}</div>
+                            <div class="stat-label">Tournaments</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${stats.surfaces.length}</div>
+                            <div class="stat-label">Surfaces</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${stats.years_covered}</div>
+                            <div class="stat-label">Years Covered</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${stats.upset_analysis.upset_rate}%</div>
+                            <div class="stat-label">Upset Rate</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${stats.ranking_analysis.avg_ranking_diff}</div>
+                            <div class="stat-label">Avg Ranking Diff</div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Event listeners
+        document.getElementById('predictionForm').addEventListener('submit', predictMatch);
+
+        // Auto-train model on page load
+        window.addEventListener('load', () => {
+            updateModelStatus('training', 'Initializing...');
+            trainModel();
+        });
+    </script>
+</body>
+</html> 
