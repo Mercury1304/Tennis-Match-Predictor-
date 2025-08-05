@@ -119,7 +119,7 @@ This generates:
 tennis-predictor/
 ├── app.py                          # Main Flask application
 ├── data_analysis.py                # Comprehensive data analysis
-├── demo.py                         # Humanized features demo
+├── demo.py                         # Features demo
 ├── requirements.txt                # Python dependencies
 ├── templates/
 │   └── index.html                 # Enhanced web interface
@@ -362,3 +362,4 @@ The Tennis Match Predictor demonstrates:
 
 
 *Get instant predictions, detailed analysis, and beautiful visualizations - all with an intuitive, user-friendly interface designed for tennis enthusiasts and data scientists alike.* 
+
