@@ -1,6 +1,6 @@
 # Tennis Match Predictor - AI-Powered Tennis Predictions
 
-A comprehensive, humanized machine learning application that predicts tennis match outcomes using historical Grand Slam data. Features an intuitive web interface, comprehensive error handling, and detailed statistical analysis.
+A comprehensive, machine learning application that predicts tennis match outcomes using historical Grand Slam data. Features an intuitive web interface, comprehensive error handling, and detailed statistical analysis.
 
 ## Features
 
@@ -337,7 +337,7 @@ We welcome contributions to make the Tennis Match Predictor even better!
 
 ## License
 
-This project is open source and available under the MIT License.
+This project is open source.
 
 ## Acknowledgments
 
@@ -362,4 +362,5 @@ The Tennis Match Predictor demonstrates:
 
 
 *Get instant predictions, detailed analysis, and beautiful visualizations - all with an intuitive, user-friendly interface designed for tennis enthusiasts and data scientists alike.* 
+
 
