@@ -337,7 +337,7 @@ We welcome contributions to make the Tennis Match Predictor even better!
 
 ## License
 
-This project is open source and available under the MIT License.
+This project is open source.
 
 ## Acknowledgments
 
@@ -359,5 +359,6 @@ The Tennis Match Predictor demonstrates:
 ---
 
 **Experience the future of tennis predictions with our AI-powered Tennis Match Predictor!**
+
 
 *Get instant predictions, detailed analysis, and beautiful visualizations - all with an intuitive, user-friendly interface designed for tennis enthusiasts and data scientists alike.* 
